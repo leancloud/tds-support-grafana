@@ -1,12 +1,13 @@
 const { exec } = require('node:child_process');
 const http = require('node:http');
 const httpProxy = require('http-proxy');
+const { grafana } = require('./package.json');
 
 process.on('unhandledRejection', console.error);
 process.on('uncaughtException', console.error);
 
-exec('./bin/grafana-server --config ../custom.ini web', {
-  cwd: './grafana-8.5.9',
+exec('./bin/grafana-server web', {
+  cwd: './grafana',
   env: {
     ...process.env,
     ...(() => {
@@ -17,11 +18,12 @@ exec('./bin/grafana-server --config ../custom.ini web', {
         ES_PASSWORD: es.password,
       };
     })(),
+    GF_SERVER_HTTP_PORT: grafana.port.toString(),
   },
 });
 
 const proxy = httpProxy.createProxyServer({
-  target: 'http://localhost:4000',
+  target: `http://localhost:${grafana.port}`,
 });
 
 /**
@@ -32,7 +34,7 @@ const routes = [
     /^\/__engine\/(?:1|1\.1)\/ping\/?$/,
     (_, res) => {
       res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ runtime: 'grafana', version: '8.5.9' }));
+      res.end(JSON.stringify({ runtime: 'grafana', version: grafana.version }));
     },
   ],
 ];

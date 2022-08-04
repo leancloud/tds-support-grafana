@@ -1,4 +1,5 @@
 build:
-  - curl https://dl.grafana.com/enterprise/release/grafana-enterprise-8.5.9.linux-amd64.tar.gz -s -o grafana.tar.gz
-  - tar -xzf grafana.tar.gz && rm grafana.tar.gz
-  - cp datasources/* grafana-8.5.9/conf/provisioning/datasources
+  - eval $(node scripts/export-grafana-env.js)
+  - curl https://dl.grafana.com/enterprise/release/grafana-enterprise-${GF_INSTALL_VERSION}.linux-amd64.tar.gz -s -o grafana.tar.gz
+  - tar -xzf grafana.tar.gz --transform='s!^[^/]\+\($\|/\)!grafana\1!' && rm grafana.tar.gz
+  - cp datasources/* grafana/conf/provisioning/datasources
