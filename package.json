@@ -1,0 +1,17 @@
+{
+  "name": "tds-support-grafana",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Depoly Grafana to LeanEngine",
+  "main": "server.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": "^16.0.0"
+  },
+  "dependencies": {
+    "http-proxy": "^1.18.1"
+  }
+}
