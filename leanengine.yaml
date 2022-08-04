@@ -1,5 +1,4 @@
 build:
   - curl https://dl.grafana.com/enterprise/release/grafana-enterprise-8.5.9.linux-amd64.tar.gz -s -o grafana.tar.gz
   - tar -xzf grafana.tar.gz && rm grafana.tar.gz
-  - sed -i '/^http_port\s*=/ s/=.*/= 4000/' grafana-8.5.9/conf/defaults.ini
   - cp datasources/* grafana-8.5.9/conf/provisioning/datasources

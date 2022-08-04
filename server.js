@@ -5,7 +5,7 @@ const httpProxy = require('http-proxy');
 process.on('unhandledRejection', console.error);
 process.on('uncaughtException', console.error);
 
-exec('./bin/grafana-server web', {
+exec('./bin/grafana-server --config ../custom.ini web', {
   cwd: './grafana-8.5.9',
   env: {
     ...process.env,
