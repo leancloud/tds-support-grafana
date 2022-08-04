@@ -1,5 +1,5 @@
 const { exec } = require('node:child_process');
-const { Server } = require('node:http');
+const http = require('node:http');
 const httpProxy = require('http-proxy');
 
 process.on('unhandledRejection', console.error);
@@ -24,19 +24,26 @@ const proxy = httpProxy.createProxyServer({
   target: 'http://localhost:4000',
 });
 
-const server = new Server((req, res) => {
-  const heathCheckPath = new RegExp('^/__engine/\\d+(.\\d+)?/ping$');
-  if (heathCheckPath.test(req.url)) {
-    res.setHeader('Content-Type', 'application/json');
-    res.end(
-      JSON.stringify({
-        runtime: 'grafana',
-        version: '8.5.9',
-      })
-    );
-    return;
-  }
+/**
+ * @type {[RegExp, (req: http.IncomingMessage, res: http.ServerResponse) => void][]}
+ */
+const routes = [
+  [
+    /^\/__engine\/(?:1|1\.1)\/ping\/?$/,
+    (_, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ runtime: 'grafana', version: '8.5.9' }));
+    },
+  ],
+];
 
+const server = new http.Server((req, res) => {
+  for (const route of routes) {
+    if (route[0].test(req.url)) {
+      route[1](req, res);
+      return;
+    }
+  }
   proxy.web(req, res);
 });
 
