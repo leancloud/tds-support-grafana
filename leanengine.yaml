@@ -2,7 +2,7 @@ exposeEnvironmentsOnBuild: true
 
 build:
   - eval $(node scripts/export-grafana-env.js)
-  - curl https://dl.grafana.com/enterprise/release/grafana-enterprise-${GF_INSTALL_VERSION}.linux-amd64.tar.gz -s -o grafana.tar.gz
+  - curl -s -x http://proxy.leancloud.cn:8080 -o grafana.tar.gz https://dl.grafana.com/oss/release/grafana-${GF_INSTALL_VERSION}.linux-amd64.tar.gz
   - tar -xzf grafana.tar.gz --transform='s!^[^/]\+\($\|/\)!grafana\1!' && rm grafana.tar.gz
   - cp datasources/* grafana/conf/provisioning/datasources
 

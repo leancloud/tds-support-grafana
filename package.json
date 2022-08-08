@@ -4,18 +4,11 @@
   "private": true,
   "description": "Deploy Grafana to LeanEngine",
   "main": "server.js",
-  "scripts": {},
-  "keywords": [],
-  "author": "",
   "license": "MIT",
   "engines": {
     "node": "^16.0.0"
   },
-  "dependencies": {
-    "http-proxy": "^1.18.1"
-  },
   "grafana": {
-    "version": "8.5.9",
-    "port": 4000
+    "version": "8.5.9"
   }
 }

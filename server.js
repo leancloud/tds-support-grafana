@@ -1,54 +1,33 @@
-const { exec } = require('node:child_process');
-const http = require('node:http');
-const httpProxy = require('http-proxy');
-const { grafana } = require('./package.json');
+const { execSync } = require('node:child_process');
 
-process.on('unhandledRejection', console.error);
-process.on('uncaughtException', console.error);
-
-exec('./bin/grafana-server web', {
+execSync('./bin/grafana-server web', {
   cwd: './grafana',
   env: {
     ...process.env,
-    ...(() => {
-      const es = new URL(process.env.ELASTICSEARCH_URL_MYES);
-      return {
-        ES_URL: es.origin,
-        ES_USERNAME: es.username,
-        ES_PASSWORD: es.password,
-      };
-    })(),
-    GF_SERVER_HTTP_PORT: grafana.port.toString(),
+    ...getElasticSearchEnvs('MYES'),
+    ...getMysqlEnvs('MYRDB'),
+    GF_SERVER_HTTP_PORT: process.env.LEANCLOUD_APP_PORT ?? '3000',
+    GF_DATABASE_TYPE: 'mysql',
   },
 });
 
-const proxy = httpProxy.createProxyServer({
-  target: `http://localhost:${grafana.port}`,
-});
+function getElasticSearchEnvs(instanceName) {
+  const url = new URL(process.env[`ELASTICSEARCH_URL_${instanceName}`]);
+  return {
+    ES_URL: url.origin,
+    ES_USERNAME: url.username,
+    ES_PASSWORD: url.password,
+  };
+}
 
-/**
- * @type {[RegExp, (req: http.IncomingMessage, res: http.ServerResponse) => void][]}
- */
-const routes = [
-  [
-    /^\/__engine\/(?:1|1\.1)\/ping\/?$/,
-    (_, res) => {
-      res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ runtime: 'grafana', version: grafana.version }));
-    },
-  ],
-];
-
-const server = new http.Server((req, res) => {
-  for (const route of routes) {
-    if (route[0].test(req.url)) {
-      route[1](req, res);
-      return;
-    }
-  }
-  proxy.web(req, res);
-});
-
-const port = parseInt(process.env.LEANCLOUD_APP_PORT ?? '3000');
-
-server.listen(port);
+function getMysqlEnvs(instanceName) {
+  const host = process.env[`MYSQL_HOST_${instanceName}`];
+  const port = process.env[`MYSQL_PORT_${instanceName}`];
+  const user = process.env[`MYSQL_ADMIN_USER_${instanceName}`];
+  const password = process.env[`MYSQL_ADMIN_PASSWORD_${instanceName}`];
+  return {
+    GF_DATABASE_HOST: `${host}:${port}`,
+    GF_DATABASE_USER: user,
+    GF_DATABASE_PASSWORD: password,
+  };
+}
