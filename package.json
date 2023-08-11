@@ -9,6 +9,6 @@
     "node": "^18.0.0"
   },
   "grafana": {
-    "version": "8.5.9"
+    "version": "8.5.27"
   }
 }
