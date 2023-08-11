@@ -6,7 +6,7 @@
   "main": "server.js",
   "license": "MIT",
   "engines": {
-    "node": "^16.0.0"
+    "node": "^18.0.0"
   },
   "grafana": {
     "version": "8.5.9"
